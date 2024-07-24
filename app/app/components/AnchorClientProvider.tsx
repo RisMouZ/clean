@@ -39,6 +39,9 @@ export const AnchorClientProvider = ({
   const wallet = useAnchorWallet();
   console.log("ANCHOR", wallet);
 
+  useEffect(() => {
+    takeUser();
+  }, [wallet]);
   const provider = new AnchorProvider(connection, wallet!, {
     commitment: "confirmed",
   });
@@ -61,20 +64,17 @@ export const AnchorClientProvider = ({
 
     // return await program.account.user.fetch(userPDA[0]);
   };
-  const takeUserStats = async (PDA: any) => {};
 
   const createAccount = async (wallet: any) => {
     const userAccount = await PublicKey.findProgramAddress(
       [wallet.toBuffer()],
       program.programId
     );
-    console.log("userAccount", userAccount[0]);
 
     const tx = program.methods
       .initUser()
       .accounts({
-        signer: walletPublicKey,
-        //@ts-ignore
+        signer: wallet.publicKey,
         user: userAccount[0],
         systemProgram: SystemProgram.programId,
       })
@@ -89,7 +89,7 @@ export const AnchorClientProvider = ({
     //@ts-ignore
     <AnchorClientContext.Provider
       //@ts-ignore
-      value={{ takeUserPDA, createAccount, takeUserStats }}
+      value={{ takeUserPDA, createAccount, program }}
     >
       {" "}
       {children}{" "}

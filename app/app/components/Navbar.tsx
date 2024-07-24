@@ -12,24 +12,35 @@ import { set } from "@coral-xyz/anchor/dist/cjs/utils/features";
 
 const Navbar = () => {
   //@ts-ignore
-  const { takeUserPDA, takeUserStats, createAccount } = useAnchorClient();
+  const { takeUserPDA, program, createAccount } = useAnchorClient();
   const [userRaffleCount, setUserRaffleCount] = useState<any>();
   const [userWinCount, setUserWinCount] = useState<any>();
   const [userAccountt, setUserAccountt] = useState();
   const [userStatss, setUserStatss] = useState();
   const wallet = useAnchorWallet();
 
-  const [walletPublicKey, setWalletPublicKey] = useState<any>(undefined);
-
   useEffect(() => {
-    setWalletPublicKey(wallet?.publicKey);
-    userAccount();
+    accountExist(wallet?.publicKey);
   });
+  const accountExist = async (wallet: any) => {
+    const userPDA = await PublicKey.findProgramAddress(
+      [wallet.toBuffer()],
+      program.programId
+    );
+    console.log("User PDA", userPDA);
 
-  const userAccount = async () => {
-    const userAccount = await takeUserPDA(wallet?.publicKey);
-    console.log("User Stats ?????", userAccount);
+    const takeUserAccount = await program.account.user.fetch(userPDA[0]);
+    console.log("User Account", takeUserAccount);
+    setUserRaffleCount(takeUserAccount.raffleCount);
+    setUserWinCount(takeUserAccount.winCount);
+
+    // return await program.account.user.fetch(userPDA[0]);
   };
+
+  // const userAccount = async () => {
+  //   const userAccount = await takeUserPDA(wallet?.publicKey);
+  //   console.log("User Stats ?????", userAccount);
+  // };
 
   return (
     <div>
@@ -57,7 +68,7 @@ const Navbar = () => {
       {userRaffleCount == undefined ? (
         <button
           className="p-4 bg-blue-500 text-white"
-          onClick={() => createAccount(walletPublicKey)}
+          onClick={() => createAccount(wallet?.publicKey)}
         >
           Créer un compte
         </button>
