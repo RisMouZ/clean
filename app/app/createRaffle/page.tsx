@@ -2,7 +2,6 @@
 
 import React from "react";
 import Navbar from "../components/Navbar";
-import CreateRaffle from "../components/CreateRaffle";
 import NftDashboard from "../components/NftDashboard";
 
 const createRaffle = () => {
@@ -17,7 +16,6 @@ const createRaffle = () => {
         <div className="flex justify-center items-center h-screen">
           <NftDashboard />
         </div>
-        <CreateRaffle />
       </div>
     </div>
   );

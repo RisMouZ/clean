@@ -17,7 +17,7 @@ export default function Home() {
             <h1>Welcome to Clean shit !!!</h1>
             <br />
 
-            {/* <User />²  */}
+            {/* <User />  */}
             <NftDashboard />
             {/* <br />
                      <button

@@ -16,7 +16,9 @@ import {
 import { ReactNode } from "react";
 import { AnchorProvider, Program } from "@coral-xyz/anchor";
 import { IDL } from "../anchor/idl";
-import { confirmTx } from "../anchor/setup";
+import { confirmTx, getATA } from "../anchor/setup";
+import createRaffle from "../createRaffle/page";
+import { getAssociatedTokenAddress } from "@solana/spl-token";
 
 const programId = new PublicKey("CKt7TmvijVPm7xgGPBXXDnemzjnaNHAiXPAKWDxpYQmV");
 export const connection = new Connection(clusterApiUrl("devnet"), "confirmed");
@@ -33,6 +35,8 @@ export const AnchorClientProvider = ({
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
   const [walletPublicKey, setWalletPublicKey] = useState<any>();
+  const [userRaffleCount, setUserRaffleCount] = useState<any>();
+  const [userWinCount, setUserWinCount] = useState<any>();
 
   const { connection } = useConnection();
 
@@ -41,6 +45,7 @@ export const AnchorClientProvider = ({
 
   useEffect(() => {
     takeUser();
+    takeUserPDA(wallet?.publicKey);
   }, [wallet]);
   const provider = new AnchorProvider(connection, wallet!, {
     commitment: "confirmed",
@@ -59,10 +64,12 @@ export const AnchorClientProvider = ({
       [wallet.toBuffer()],
       program.programId
     );
-    const takeUserAccount = await program.account.user.fetch(userPDA[0]);
-    console.log("User Account", takeUserAccount);
+    console.log("User PDA", userPDA);
 
-    // return await program.account.user.fetch(userPDA[0]);
+    const takeUserAccount = await program.account.user.fetch(userPDA[0]);
+
+    setUserRaffleCount(takeUserAccount.raffleCount);
+    setUserWinCount(takeUserAccount.winCount);
   };
 
   const createAccount = async (wallet: any) => {
@@ -85,11 +92,30 @@ export const AnchorClientProvider = ({
     await confirmTx(tx, connection);
   };
 
+  const createRaffle = async (
+    mintAddress: any,
+    price: any,
+    endWithDeadline: any,
+    maxTickets: any,
+    deadline: number
+  ) => {
+    const userWallet = wallet?.publicKey;
+    const userPDA = await PublicKey.findProgramAddress(
+      [userWallet!.toBuffer()],
+      program.programId
+    );
+
+    // const rafflePDA
+
+    const PdaAta = await getAssociatedTokenAddress;
+    console.log("createRaffle");
+  };
+
   return (
     //@ts-ignore
     <AnchorClientContext.Provider
       //@ts-ignore
-      value={{ takeUserPDA, createAccount, program }}
+      value={{ takeUserPDA, createAccount, createRaffle, program }}
     >
       {" "}
       {children}{" "}
